@@ -9,9 +9,11 @@ public class trajectory_logic : MonoBehaviour
     private Rigidbody rb;
 
     private bool isShoot;
+    public int shotCount = 0;
 
     void Start() {
     	rb = GetComponent<Rigidbody>();
+    	isShoot = false;
     }
 
     private void OnMouseDown() {
@@ -23,8 +25,13 @@ public class trajectory_logic : MonoBehaviour
     	Shoot(Force: mousePressDownPos-mouseReleasePos);
     }
 
-    private float forceMultiplier = 3;
+    private float forceMultiplier = 5;
 
+    void Update() {
+    	if(rb.IsSleeping()) {
+    		isShoot = false;
+    	}
+    }
     // Update is called once per frame
     void Shoot(Vector3 Force) {
     	if(isShoot) {
@@ -33,5 +40,17 @@ public class trajectory_logic : MonoBehaviour
 
     	rb.AddForce(new Vector3(Force.x, Force.y, z:Force.y) * forceMultiplier);
     	isShoot = true;
+    	shotCount += 1;
     }
+
+	void OnCollisionEnter() {
+		if (isShoot) {
+			rb.drag += 10f;
+		}
+    }
+
+    void OnCollisionExit() {
+       rb.drag = 0.1f;
+    }
+
 }
